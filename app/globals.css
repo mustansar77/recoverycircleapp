@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds — distinct steps for proper depth */
+  --bg:          #070d1c;
+  --surface:     #0c1528;
+  --card:        #111e35;
+  --raised:      #16253f;
+  --hover:       #1c2f50;
+
+  /* Borders */
+  --border:      #243556;
+  --border-sub:  #1a2a47;
+
+  /* Text */
+  --text:        #e8f0fe;
+  --text-2:      #8fa8cc;
+  --text-3:      #556882;
+
+  /* Blue accent */
+  --blue:        #3b82f6;
+  --blue-dark:   #2563eb;
+  --blue-light:  #60a5fa;
+  --blue-bg:     #0c1e42;
+  --blue-border: #1e3d80;
+
+  /* Status colors */
+  --green:       #22c55e;
+  --green-bg:    #052917;
+  --green-border:#0a4020;
+
+  --red:         #f43f5e;
+  --red-bg:      #1a080d;
+  --red-border:  #7d1a2a;
+
+  --yellow:      #f59e0b;
+  --yellow-bg:   #1a1205;
+  --yellow-border:#6b3d00;
+
+  --purple:      #a855f7;
+  --purple-bg:   #180630;
+  --purple-border:#4a1070;
+
+  --teal:        #14b8a6;
+  --teal-bg:     #042f2c;
+  --teal-border: #0d4f49;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Form elements */
+input, textarea, select {
+  color: var(--text);
+  background-color: var(--card);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-3);
+}
+
+select option {
+  background-color: var(--card);
+  color: var(--text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-dark); }
+
+/* Text selection */
+::selection { background: rgba(59, 130, 246, 0.25); color: var(--text); }
+
+/* Smooth focus outline */
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+
+/* Utility: glass card effect */
+.glass-card {
+  background: linear-gradient(135deg, rgba(22, 37, 63, 0.8), rgba(17, 30, 53, 0.6));
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+/* Hover transition helper */
+.hover-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}

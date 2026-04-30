@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias=\"@/*\" --yes)",
+      "Bash(npx create-next-app@latest . --no-typescript --tailwind --eslint --app --no-src-dir --import-alias=\"@/*\" --yes)",
+      "Bash(npm install *)",
+      "Bash(npx next *)",
+      "Bash(mkdir -p \"E:\\\\Company Project\\\\Apps By Claude\\\\recoverycircleapp\\\\app\\\\api\\\\meetings\\\\[id]\\\\register\")",
+      "Bash(mkdir -p \"E:\\\\Company Project\\\\Apps By Claude\\\\recoverycircleapp\\\\app\\\\api\\\\meetings\\\\[id]\\\\token\")"
+    ]
+  }
+}
