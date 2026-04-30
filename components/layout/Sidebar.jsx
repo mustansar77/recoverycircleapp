@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import {
-  LayoutDashboard, Users, ShoppingBag, ClipboardList,
+  Users, ShoppingBag, ClipboardList,
   Video, Award, LogOut, Coins, Heart, Gift,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -12,28 +12,24 @@ import { useRouter } from "next/navigation";
 
 const NAV = {
   superadmin: [
-    { href: "/superadmin",           icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/superadmin/users",     icon: Users,           label: "Users" },
-    { href: "/superadmin/store",     icon: ShoppingBag,     label: "Store" },
-    { href: "/superadmin/orders",    icon: ClipboardList,   label: "Orders" },
-    { href: "/superadmin/requests",  icon: Coins,           label: "Requests" },
-    { href: "/superadmin/meetings",  icon: Video,           label: "Meetings" },
+    { href: "/superadmin/users",     icon: Users,        label: "Users" },
+    { href: "/superadmin/store",     icon: ShoppingBag,  label: "Store" },
+    { href: "/superadmin/orders",    icon: ClipboardList,label: "Orders" },
+    { href: "/superadmin/requests",  icon: Coins,        label: "Requests" },
+    { href: "/superadmin/meetings",  icon: Video,        label: "Meetings" },
   ],
   admin: [
-    { href: "/admin",          icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/meetings", icon: Video,           label: "Meetings" },
-    { href: "/admin/rewards",  icon: Gift,            label: "Give Rewards" },
+    { href: "/admin/meetings", icon: Video, label: "Meetings" },
+    { href: "/admin/rewards",  icon: Gift,  label: "Give Rewards" },
   ],
   guide: [
-    { href: "/guide",          icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/guide/meetings", icon: Video,           label: "My Meetings" },
-    { href: "/guide/store",    icon: ShoppingBag,     label: "Store" },
+    { href: "/guide/meetings", icon: Video,       label: "My Meetings" },
+    { href: "/guide/store",    icon: ShoppingBag, label: "Store" },
   ],
   user: [
-    { href: "/user",                icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/user/meetings",       icon: Video,           label: "Meetings" },
-    { href: "/user/store",          icon: ShoppingBag,     label: "Store" },
-    { href: "/user/certification",  icon: Award,           label: "Certification" },
+    { href: "/user/meetings",      icon: Video,       label: "Meetings" },
+    { href: "/user/store",         icon: ShoppingBag, label: "Store" },
+    { href: "/user/certification", icon: Award,       label: "Certification" },
   ],
 };
 

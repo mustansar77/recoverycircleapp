@@ -5,12 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Video, Coins, ShoppingBag, Award, CheckCircle, Loader2 } from "lucide-react";
 import { StatCard } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
-import BuyKarmaModal from "@/components/karma/BuyKarmaModal";
 import Link from "next/link";
 
 export default function UserDashboardClient({ balance: initialBalance, registeredMeetings, orderCount, subscription }) {
-  const [buyModal, setBuyModal]   = useState(false);
   const [balance,  setBalance]    = useState(initialBalance);
   const [karmaBanner, setBanner]  = useState(null); // { coins, status: "loading"|"success"|"error", msg }
   const searchParams = useSearchParams();
@@ -98,9 +95,6 @@ export default function UserDashboardClient({ balance: initialBalance, registere
           <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>My Dashboard</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-3)" }}>Your activity overview</p>
         </div>
-        <Button size="sm" onClick={() => setBuyModal(true)}>
-          <Coins size={13} /> Buy KarmaCoins
-        </Button>
       </div>
 
       {/* Stats */}
@@ -165,7 +159,6 @@ export default function UserDashboardClient({ balance: initialBalance, registere
         )}
       </div>
 
-      <BuyKarmaModal open={buyModal} onClose={() => setBuyModal(false)} />
     </div>
   );
 }

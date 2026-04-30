@@ -1,30 +1,68 @@
 @import "tailwindcss";
 
+/* ── Light mode (default) ───────────────────────────────────────────────── */
 :root {
-  /* Backgrounds — distinct steps for proper depth */
+  --bg:           #f0f4ff;
+  --surface:      #ffffff;
+  --card:         #f5f8ff;
+  --raised:       #eaeffc;
+  --hover:        #dce6f8;
+
+  --border:       #c8d5ee;
+  --border-sub:   #dde6f5;
+
+  --text:         #0f172a;
+  --text-2:       #334155;
+  --text-3:       #64748b;
+
+  --blue:         #2563eb;
+  --blue-dark:    #1d4ed8;
+  --blue-light:   #1d4ed8;
+  --blue-bg:      #eff6ff;
+  --blue-border:  #bfdbfe;
+
+  --green:        #16a34a;
+  --green-bg:     #f0fdf4;
+  --green-border: #bbf7d0;
+
+  --red:          #dc2626;
+  --red-bg:       #fff1f2;
+  --red-border:   #fecdd3;
+
+  --yellow:       #b45309;
+  --yellow-bg:    #fffbeb;
+  --yellow-border:#fde68a;
+
+  --purple:       #7c3aed;
+  --purple-bg:    #f5f3ff;
+  --purple-border:#ddd6fe;
+
+  --teal:         #0d9488;
+  --teal-bg:      #f0fdfa;
+  --teal-border:  #99f6e4;
+}
+
+/* ── Dark mode ──────────────────────────────────────────────────────────── */
+html[data-theme="dark"] {
   --bg:          #070d1c;
   --surface:     #0c1528;
   --card:        #111e35;
   --raised:      #16253f;
   --hover:       #1c2f50;
 
-  /* Borders */
   --border:      #243556;
   --border-sub:  #1a2a47;
 
-  /* Text */
   --text:        #e8f0fe;
   --text-2:      #8fa8cc;
   --text-3:      #556882;
 
-  /* Blue accent */
   --blue:        #3b82f6;
   --blue-dark:   #2563eb;
   --blue-light:  #60a5fa;
   --blue-bg:     #0c1e42;
   --blue-border: #1e3d80;
 
-  /* Status colors */
   --green:       #22c55e;
   --green-bg:    #052917;
   --green-border:#0a4020;
@@ -56,7 +94,7 @@ body {
 /* Form elements */
 input, textarea, select {
   color: var(--text);
-  background-color: var(--card);
+  background-color: var(--surface);
 }
 
 input::placeholder,
@@ -81,18 +119,10 @@ select option {
 /* Smooth focus outline */
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
 
-/* Utility: glass card effect */
-.glass-card {
-  background: linear-gradient(135deg, rgba(22, 37, 63, 0.8), rgba(17, 30, 53, 0.6));
-  border: 1px solid var(--border);
-  backdrop-filter: blur(8px);
-}
-
 /* Hover transition helper */
 .hover-lift {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .hover-lift:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }

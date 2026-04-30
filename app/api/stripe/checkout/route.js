@@ -34,6 +34,10 @@ export async function POST(request) {
       const quantity = Math.max(1, Math.floor(Number(karmaBundles)));
       const coins    = quantity * KARMA_RATE.coins;
 
+      // Redirect to the correct home page based on role
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+      const roleHome = { guide: "/guide", superadmin: "/superadmin", admin: "/admin" }[profile?.role] ?? "/user";
+
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         payment_method_types: ["card"],
@@ -46,8 +50,8 @@ export async function POST(request) {
           quantity,
         }],
         metadata: { userId: user.id, type: "karma", coins: String(coins) },
-        success_url: `${base}/user?karma=success&coins=${coins}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url:  `${base}/user`,
+        success_url: `${base}${roleHome}?karma=success&coins=${coins}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url:  `${base}${roleHome}`,
       });
 
       return NextResponse.json({ url: session.url });

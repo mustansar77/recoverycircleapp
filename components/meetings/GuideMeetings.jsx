@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Video, Calendar, Clock, Users, Coins, Plus, Pencil, Trash2, Award, Check } from "lucide-react";
+import { Video, Calendar, Clock, Users, Coins, Plus, Pencil, Trash2, Award, Check, Lock } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -338,6 +338,130 @@ function CertificationMeetings({ balance, setBalance, session, setSession, toast
   );
 }
 
+// ── Browse other guide meetings ───────────────────────────────────────────
+function BrowseMeetings({ balance, setBalance, session, setSession, toast }) {
+  const [meetings,    setMeetings]    = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [registering, setRegistering] = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    // Fetch all guide-type meetings (includes other guides')
+    const res = await fetch("/api/meetings?type=guide");
+    const data = await res.json();
+    // Exclude own meetings (host_me ones) — show everything a regular user would see
+    setMeetings(Array.isArray(data) ? data.filter(m => m.status !== "cancelled") : []);
+    setLoading(false);
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  async function handleJoin(meeting) {
+    const res  = await fetch(`/api/meetings/${meeting.id}/token`);
+    const data = await res.json();
+    if (!res.ok) { toast(data.error, "error"); return; }
+    setSession({ ...data, meetingTitle: meeting.title });
+  }
+
+  async function handleRegister(meeting) {
+    setRegistering(meeting.id);
+    const res  = await fetch(`/api/meetings/${meeting.id}/register`, { method: "POST" });
+    const data = await res.json();
+    setRegistering(null);
+    if (!res.ok) { toast(data.error, "error"); return; }
+    setBalance(b => b - (data.karma_spent ?? 0));
+    toast(`Registered for "${meeting.title}"`, "success");
+    load();
+  }
+
+  async function handleUnregister(meeting) {
+    setRegistering(meeting.id);
+    const res  = await fetch(`/api/meetings/${meeting.id}/register`, { method: "DELETE" });
+    const data = await res.json();
+    setRegistering(null);
+    if (!res.ok) { toast(data.error, "error"); return; }
+    setBalance(b => b + (data.refunded ?? 0));
+    toast(`Unregistered — ${data.refunded ?? 0} KC refunded`, "info");
+    load();
+  }
+
+  if (loading) return <PageSpinner />;
+
+  if (meetings.length === 0) return (
+    <EmptyState icon={Video} title="No guide meetings available" description="Check back soon for upcoming sessions." />
+  );
+
+  return (
+    <div className="space-y-3">
+      {meetings.map(m => {
+        const isLive = m.status === "live";
+        const isPast = m.status === "ended";
+        return (
+          <div key={m.id} className="rounded-2xl p-5 flex flex-col sm:flex-row gap-4"
+            style={{ backgroundColor: "var(--surface)", border: `1px solid ${isLive ? "var(--green-border)" : "var(--border)"}` }}>
+            <div className="flex-1 space-y-2">
+              <div className="flex items-start gap-3 flex-wrap">
+                <h3 className="font-semibold" style={{ color: "var(--text)" }}>{m.title}</h3>
+                <Badge color={STATUS_COLOR[m.status] ?? "gray"}>{m.status}</Badge>
+              </div>
+              <div className="flex flex-wrap gap-4 text-xs" style={{ color: "var(--text-3)" }}>
+                <span className="flex items-center gap-1.5"><Calendar size={12} />
+                  {new Date(m.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  {" · "}{new Date(m.date).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+                </span>
+                <span className="flex items-center gap-1.5"><Clock size={12} />{m.duration_minutes} min</span>
+                <span className="flex items-center gap-1.5"><Users size={12} />{m.registration_count ?? 0}/{m.max_participants}</span>
+                {m.karma_cost > 0 && (
+                  <span className="flex items-center gap-1.5" style={{ color: "var(--yellow)" }}>
+                    <Coins size={12} />{m.karma_cost} KC
+                  </span>
+                )}
+              </div>
+              {m.host && (
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                    style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>
+                    {m.host.full_name?.[0]?.toUpperCase() ?? "G"}
+                  </div>
+                  <span className="text-xs" style={{ color: "var(--text-2)" }}>{m.host.full_name ?? m.host.email}</span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+              {isPast && <span className="text-xs" style={{ color: "var(--text-3)" }}>Ended</span>}
+              {isLive && m.is_registered && (
+                <Button size="sm" onClick={() => handleJoin(m)}><Video size={13} /> Join Now</Button>
+              )}
+              {!isPast && m.is_registered && !isLive && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold"
+                    style={{ backgroundColor: "var(--green-bg)", color: "var(--green)", border: "1px solid var(--green-border)" }}>
+                    <Check size={12} /> Registered
+                  </div>
+                  <Button size="sm" variant="secondary" disabled={registering === m.id} onClick={() => handleUnregister(m)}>
+                    {registering === m.id ? "…" : "Cancel"}
+                  </Button>
+                </div>
+              )}
+              {!isPast && !m.is_registered && (
+                <Button size="sm"
+                  disabled={registering === m.id || balance < (m.karma_cost ?? 0)}
+                  onClick={() => isLive ? handleJoin(m) : handleRegister(m)}>
+                  {registering === m.id ? "…" : isLive
+                    ? <><Video size={12} /> Join</>
+                    : m.karma_cost > 0
+                      ? <><Coins size={12} /> Register · {m.karma_cost} KC</>
+                      : "Register"
+                  }
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Root component ─────────────────────────────────────────────────────────
 export default function GuideMeetings({ initialBalance }) {
   const [section, setSection] = useState("my");
@@ -362,22 +486,17 @@ export default function GuideMeetings({ initialBalance }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Meetings</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-3)" }}>Manage and join your sessions</p>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-bold"
-          style={{ backgroundColor: "var(--yellow-bg)", border: "1px solid var(--yellow-border)", color: "var(--yellow)" }}>
-          <Coins size={14} /> {balance} KC
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Meetings</h1>
+        <p className="text-sm mt-1" style={{ color: "var(--text-3)" }}>Manage and join your sessions</p>
       </div>
 
       {/* Section toggle */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {[
-          { value: "my",   label: "My Guide Meetings", icon: Video },
-          { value: "cert", label: "Certification Meetings", icon: Award },
+          { value: "my",     label: "My Meetings",           icon: Video },
+          { value: "browse", label: "Browse Guide Meetings", icon: Users },
+          { value: "cert",   label: "Certification",         icon: Award },
         ].map(({ value, label, icon: Icon }) => (
           <button key={value} onClick={() => setSection(value)}
             className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all"
@@ -390,10 +509,9 @@ export default function GuideMeetings({ initialBalance }) {
         ))}
       </div>
 
-      {section === "my"
-        ? <MyMeetings balance={balance} setBalance={setBalance} session={session} setSession={setSession} toast={toast} />
-        : <CertificationMeetings balance={balance} setBalance={setBalance} session={session} setSession={setSession} toast={toast} />
-      }
+      {section === "my"     && <MyMeetings balance={balance} setBalance={setBalance} session={session} setSession={setSession} toast={toast} />}
+      {section === "browse" && <BrowseMeetings balance={balance} setBalance={setBalance} session={session} setSession={setSession} toast={toast} />}
+      {section === "cert"   && <CertificationMeetings balance={balance} setBalance={setBalance} session={session} setSession={setSession} toast={toast} />}
 
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </div>
